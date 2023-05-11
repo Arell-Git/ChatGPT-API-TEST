@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT API CHECK</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+            background: #0f172a;
+            color: white;
+            font-family: "Poppins", sans-serif;
+            padding: 12px;
+        }
+
+        header {
+            padding: 10px 0;
+            display: grid;
+            place-items: center;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            gap: 14px;
+        }
+
+        main section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        main section div {
+            text-align: center;
+            border: 1px solid blue;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        main section div:hover {
+            border-color: cyan;
+        }
+
+        #second,
+        #loading,
+        #recommendations,
+        #recipe {
+            display: none;
+        }
+
+        span {
+            text-align: center;
+            background: blue;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid blue;
+
+        }
+
+        span:hover {
+            background: transparent;
+        }
+        button {
+            text-align: center;
+            background: blue;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid blue;
+        }
+        button:hover {
+            border-color: cyan;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>GPT API TEST</h1>
+    </header>
+    <main>
+        <section id="output">
+            <h4>Output</h4>
+            <div onclick="selectPrompt('Output type: Essay,')">Essay</div>
+            <div onclick="selectPrompt('Output type: Email,')">Email</div>
+            <div onclick="selectPrompt('Output type: Poem,')">Poem</div>
+        </section>
+        <section id="length">
+            <h4>Length</h4>
+            <div onclick="selectPrompt('Length: 200 words,')">200 words</div>
+            <div onclick="selectPrompt('Length: 500 words,')">500 words</div>
+            <div onclick="selectPrompt('Length: 3 paragraphs,')">3 paragraphs</div>
+        </section>
+        
+        <div id="result">The selected prompts are:</div>
+        <button type="button" onclick="sendPrompt()">Generate Prompt</button>
+        <section id="promptFactory">
+
+        </section>
+    </main>
+</body>
+
+
+<script>
+    let prompt = null
+    let prompts = []
+    const firstEle = document.getElementById('length')
+    const factory = document.getElementById('promptFactory')
+    function selectPrompt(promptChoice){
+        prompt = promptChoice
+        prompts.push(prompt)
+        console.log(prompt)
+        displayPrompt();
+    }
+    function displayPrompt(){
+        document.getElementById("result").innerHTML += " " + prompt
+    }
+
+
+
+    async function sendPrompt() {
+        let request = ``
+        prompts.forEach(prompt => {
+            request += `${prompt} `
+        })
+
+        request += `Please provide the prompt with no confirmation or intro, just give me the prompt starting with "Prompt: ".`
+        console.log(request)
+
+
+        try {
+            const res = await fetch('http://localhost:1337/api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 'prompt': request })
+            })
+            const response = await res.json()
+            const content = response.message[0].message.content;
+            factory.innerHTML = `<p>${content}</p>`;
+            console.log(message)
+        } catch (err) {
+            console.log(err.message)
+        }
+        
+    }
+</script>
+</html>
